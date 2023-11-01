@@ -232,12 +232,12 @@ void TropicoFrac::PositiveDegree(TropicoFrac& tf1, TropicoFrac& tf2) const
     }
 }
 
-unsigned long long TropicoFrac::ValueIntPositive() const
+bigint TropicoFrac::ValueIntPositive() const
 {
-    unsigned long long res = 1;
+    bigint res(1);
 
     if (ContainPrime(0))
-        return 0;
+        return bigint(0);
 
     for (const PrimeDegreeFrac& p : n)
         for (int i{}; i < p.GetDegreeFrac().GetN(); ++i)

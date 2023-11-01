@@ -5,6 +5,8 @@
 #include <cmath>
 #include <string>
 #include <set>
+#include <algorithm>
+#include "BigInt.h"
 
 class DegreeFrac
 {
@@ -80,7 +82,7 @@ public:
     TropicoFrac(const PrimeDegreeFrac _prime) { n.insert(_prime); }
     TropicoFrac(const std::set<PrimeDegreeFrac>& _n) : n(_n) {}
 
-    unsigned long long ValueIntPositive() const;
+    bigint ValueIntPositive() const;
 
     double ToDouble() const;
 
