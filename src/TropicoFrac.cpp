@@ -350,8 +350,9 @@ bool TropicoFrac::operator<=(const TropicoFrac& tf) const
             tf2 *= PrimeDegreeFrac(p.GetPrime(), -df);
         }
     }
-
-    if ((tf1.ValueIntPositive() <= tf2.ValueIntPositive()) != (this->ToDouble() <= tf.ToDouble()))
+    bigint val1(tf1.ValueIntPositive()), val2(tf2.ValueIntPositive());
+    bool res = val1 <= val2;
+    if (res != (this->ToDouble() <= tf.ToDouble()))
     {
         std::cout << "ERROR!!!\n";
         std::cout << m << "\n";
@@ -362,7 +363,7 @@ bool TropicoFrac::operator<=(const TropicoFrac& tf) const
         std::cout << this->ToDouble() << " " << tf.ToDouble() << "\n\n";
     }
 
-    return tf1.ValueIntPositive() <= tf2.ValueIntPositive();
+    return res;
 }
 
 TropicoFrac& TropicoFrac::operator+=(const TropicoFrac& tf)
