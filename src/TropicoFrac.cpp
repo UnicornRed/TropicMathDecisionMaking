@@ -605,6 +605,27 @@ std::vector<std::vector<double>> TropicoMatrix::ToDouble() const
     return res;
 }
 
+std::ostream& ToDoubleTeXOut(std::ostream& out, const TropicoMatrix& tm)
+{
+    std::vector<std::vector<double>> outMatrix = tm.ToDouble();
+
+    out << "\t\t\\begin{pmatrix}\n";
+
+    for (size_t i{}; i < outMatrix.size(); ++i)
+    {
+        out << "\t\t\t";
+
+        for(size_t j{}; j < outMatrix[0].size(); ++j)
+            out << std::setprecision(4) << std::setw(8) << std::left << double(outMatrix[i][j]) << (j == tm.GetWidth() - 1 ? " " : " & ");
+
+        out << "\\\\\n";
+    }
+
+    out << "\t\t\\end{pmatrix}";
+
+    return out;
+}
+
 std::ostream& ToDoubleOut(std::ostream& out, const TropicoMatrix& tm)
 {
     std::vector<std::vector<double>> outMatrix = tm.ToDouble();
@@ -622,17 +643,19 @@ std::ostream& ToDoubleOut(std::ostream& out, const TropicoMatrix& tm)
 
 std::ostream& MakeTeX(std::ostream& out, const TropicoMatrix& tm)
 {
-    out << "\\begin{pmatrix}\n";
+    out << "\t\t\\begin{pmatrix}\n";
 
     for (size_t i{}; i < tm.GetHeight(); ++i)
     {
+        out << "\t\t\t";
+
         for(size_t j{}; j < tm.GetWidth(); ++j)
-            MakeTeX(out,tm.matr[i][j]) << " & ";
+            MakeTeX(out,tm.matr[i][j]) << (j == tm.GetWidth() - 1 ? " " : " & ");
 
         out << "\\\\\n";
     }
 
-    out << "\\end{pmatrix}";
+    out << "\t\t\\end{pmatrix}";
 
     return out;
 }
@@ -815,7 +838,8 @@ TropicoSolve::TropicoSolve(TropicoMatrix _tm) : tm(_tm)
 TropicoMatrix TropicoSolve::WorstSolve()
 {
     delta = (TropicoMatrix(1, tm.GetWidth(), 1) * kleene * TropicoMatrix(tm.GetHeight(), 1, 1))[0][0];
-    worst = ((delta ^ (-1)) * TropicoMatrix(tm.GetHeight(), tm.GetWidth(), 1) + (spectral ^ (-1)) * tm).Kleene() * TropicoMatrix(tm.GetHeight(), 1, 1);
+    worstMatr = ((delta ^ (-1)) * TropicoMatrix(tm.GetHeight(), tm.GetWidth(), 1) + (spectral ^ (-1)) * tm).Kleene();
+    worst = worstMatr * TropicoMatrix(tm.GetHeight(), 1, 1);
 
     worst.Standardization();
 
@@ -884,7 +908,8 @@ TropicoMatrix TropicoSolve::BestSolve()
     P = MakeP();
     Plk = MakePlk();
 
-    best = P * (TropicoMatrix::GetI(P.GetWidth()) + Plk.MultiConjTrans() * P) * TropicoMatrix(P.GetWidth(), 1, 1);
+    bestMatr = P * (TropicoMatrix::GetI(P.GetWidth()) + Plk.MultiConjTrans() * P);
+    best = bestMatr * TropicoMatrix(P.GetWidth(), 1, 1);
     best.Standardization();
 
     return best;
@@ -899,6 +924,43 @@ void TropicoSolve::Solve()
     BestSolve();
 }
 
+std::ostream& MakeTeXMatrix(std::ostream& out, std::string str, const TropicoMatrix& tm)
+{
+    out << "\t\\[\n";
+    out << "\t\t" << str << " = \n";
+    MakeTeX(out, tm) << "\n\t\t\\approx\n";
+    ToDoubleTeXOut(out, tm) << "\n\t\\]\n";
+
+    return out;
+}
+
+std::ostream& MakeTeXFrac(std::ostream& out, std::string str, const TropicoFrac& tf)
+{
+    out << "\t\\[\n";
+    out << "\t\t" << str << " = ";
+    MakeTeX(out, tf) << "\\approx " << tf.ToDouble() << "\n\t\\]\n";
+
+    return out;
+}
+
+std::ostream& MakeTeX(std::ostream& out, const TropicoSolve& ts)
+{
+    MakeTeXMatrix(out, "\\bold{" + ts.GetName() + "}", ts.GetMatrix());
+    MakeTeXFrac(out, "\\lambda_{" + ts.GetName() + "}", ts.GetSpectral());
+    MakeTeXMatrix(out, "(\\lambda_{" + ts.GetName() + "}^{-1}\\bold{" + ts.GetName() + "})^*", ts.GetKleene());
+    MakeTeXFrac(out, "\\delta_{" + ts.GetName() + "}", ts.GetDelta());
+    MakeTeXMatrix(out, "(\\delta_{" + ts.GetName() + "}^{-1}\\bold{11}^T \\oplus \\lambda_{" +
+                  ts.GetName() + "}\\bold{" + ts.GetName() + "})^*", ts.GetWorstMatrix());
+    MakeTeXMatrix(out, "\\bold{x}'_{" + ts.GetName() + "}", ts.GetWorst());
+    MakeTeXMatrix(out, "\\bold{P}_{" + ts.GetName() + "}", ts.GetP());
+    MakeTeXMatrix(out, "\\bold{P}^{lk}_{" + ts.GetName() + "}", ts.GetPlk());
+    MakeTeXMatrix(out, "\\bold{P}_{" + ts.GetName() + "}(\\bold{I} \\oplus \\bold{P}^{lk}_{" +
+                  ts.GetName() + "}\\bold{P}_{" + ts.GetName() + "})", ts.GetBestMatrix());
+    MakeTeXMatrix(out, "\\bold{x}''_{" + ts.GetName() + "}", ts.GetBest());
+
+    return out;
+}
+
 std::ostream& operator<<(std::ostream& out, const TropicoSolve& ts)
 {
     out << "Matrix " << ts.GetName() << ":\n";
@@ -908,12 +970,16 @@ std::ostream& operator<<(std::ostream& out, const TropicoSolve& ts)
     out << "Kleene:\n" << ts.GetKleene() << "~\n";
     ToDoubleOut(out, ts.GetKleene()) << "\n";
     out << "Delta: \n" << ts.GetDelta() << " ~ " << ts.GetDelta().ToDouble() << "\n\n";
+    out << "Worst Solve Matrix:\n" << ts.GetWorstMatrix() << "~\n";
+    ToDoubleOut(out, ts.GetWorstMatrix()) << "\n";
     out << "Worst Solve:\n" << ts.GetWorst() << "~\n";
     ToDoubleOut(out, ts.GetWorst()) << "\n";
     out << "P:\n" << ts.GetP() << "~\n";
     ToDoubleOut(out, ts.GetP()) << "\n";
     out << "P_{lk}:\n" << ts.GetPlk() << "~\n";
     ToDoubleOut(out, ts.GetPlk()) << "\n";
+    out << "Best Solve Matrix:\n" << ts.GetBestMatrix() << "~\n";
+    ToDoubleOut(out, ts.GetBestMatrix()) << "\n";
     out << "Best Solve:\n" << ts.GetBest() << "~\n";
     ToDoubleOut(out, ts.GetBest()) << "\n";
 
@@ -941,6 +1007,15 @@ void TropicoMultiSolve::Solve()
     tsC.GiveName("C");
     tsBW.GiveName("B_1");
     tsBB.GiveName("B_2");
+}
+
+std::ostream& MakeTeX(std::ostream& out, const TropicoMultiSolve& tms)
+{
+    MakeTeX(out, tms.tsC) << "\n";
+    MakeTeX(out, tms.tsBW) << "\n";
+    MakeTeX(out, tms.tsBB) << "\n";
+
+    return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const TropicoMultiSolve& tms)

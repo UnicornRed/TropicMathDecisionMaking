@@ -145,6 +145,7 @@ public:
 
     friend bool CorrelVector(const TropicoMatrix& tm1, const TropicoMatrix& tm2);
 
+    friend std::ostream& ToDoubleTeXOut(std::ostream& out, const TropicoMatrix& tm);
     friend std::ostream& ToDoubleOut(std::ostream& out, const TropicoMatrix& tm);
     friend std::ostream& MakeTeX(std::ostream& out, const TropicoMatrix& tm);
     friend std::ostream& operator<<(std::ostream& out, const TropicoMatrix& tm);
@@ -155,6 +156,7 @@ bool CorrelVector(const TropicoMatrix& tm1, const TropicoMatrix& tm2);
 
 inline TropicoMatrix operator*(const TropicoFrac& tf, const TropicoMatrix& tm) { return tm * tf; }
 
+std::ostream& ToDoubleTeXOut(std::ostream& out, const TropicoMatrix& tm);
 std::ostream& ToDoubleOut(std::ostream& out, const TropicoMatrix& tm);
 std::ostream& MakeTeX(std::ostream& out, const TropicoMatrix& tm);
 std::ostream& operator<<(std::ostream& out, const TropicoMatrix& tm);
@@ -166,6 +168,8 @@ private:
     TropicoMatrix tm;
     TropicoFrac spectral;
     TropicoMatrix kleene;
+    TropicoMatrix worstMatr;
+    TropicoMatrix bestMatr;
     TropicoMatrix worst;
     TropicoMatrix best;
     TropicoFrac delta;
@@ -186,6 +190,8 @@ public:
     inline const TropicoMatrix& GetMatrix() const { return tm; }
     inline const TropicoFrac& GetSpectral() const { return spectral; }
     inline const TropicoMatrix& GetKleene() const { return kleene; }
+    inline const TropicoMatrix& GetWorstMatrix() const { return worstMatr; }
+    inline const TropicoMatrix& GetBestMatrix() const { return bestMatr; }
     inline const TropicoMatrix& GetWorst() const { return worst; }
     inline const TropicoMatrix& GetBest() const { return best; }
     inline const TropicoFrac& GetDelta() const { return delta; }
@@ -196,9 +202,11 @@ public:
 
     void Solve();
 
+    friend std::ostream& MakeTeX(std::ostream& out, const TropicoSolve& ts);
     friend std::ostream& operator<<(std::ostream& out, const TropicoSolve& ts);
 };
 
+std::ostream& MakeTeX(std::ostream& out, const TropicoSolve& ts);
 std::ostream& operator<<(std::ostream& out, const TropicoSolve& ts);
 
 class TropicoMultiSolve
@@ -214,9 +222,14 @@ public:
     
     void Solve();
 
+    friend std::ostream& MakeTeX(std::ostream& out, const TropicoMultiSolve& tms);
     friend std::ostream& operator<<(std::ostream& out, const TropicoMultiSolve& tms);
     friend std::istream& operator>>(std::istream& in, TropicoMultiSolve& tms);
 };
 
+std::ostream& MakeTeXMatrix(std::ostream& out, std::string str, const TropicoMatrix& tm);
+std::ostream& MakeTeXFrac(std::ostream& out, std::string str, const TropicoFrac& tf);
+
+std::ostream& MakeTeX(std::ostream& out, const TropicoMultiSolve& tms);
 std::ostream& operator<<(std::ostream& out, const TropicoMultiSolve& tms);
 std::istream& operator>>(std::istream& in, TropicoMultiSolve& tms);
