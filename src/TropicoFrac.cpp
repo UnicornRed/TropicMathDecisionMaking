@@ -246,27 +246,17 @@ bigint TropicoFrac::ValueIntPositive() const
     return res;
 }
 
-void SqrtProd(std::ostream& out, const std::pair<DegreeFrac, std::vector<int>> t, int sign = 1)
+void SqrtProd(std::ostream& out, const std::pair<int, int> t, int sign = 1)
 {
-    if (t.first.GetM() != 1)
+    if (t.first != sign)
     {
-        if (t.first.GetM() == 2)
+        if (std::abs(t.first) == 2)
             out << "\\sqrt";
         else
-            out << "\\sqrt[" << t.first.GetM() << "]";
+            out << "\\sqrt[" << std::abs(t.first) << "]";
     }
-
-    int prod = 1;
-
-    for (const int& i : t.second)
-        prod *= i;
     
-    out << "{" << prod;
-
-    if (t.first.GetN() != sign)
-        out << "^{" << sign * t.first.GetN() << "}";
-
-    out << "}";
+    out << "{" << t.second << "}";
 }
 
 double TropicoFrac::ToDouble() const
@@ -282,14 +272,22 @@ double TropicoFrac::ToDouble() const
 std::ostream& MakeTeX(std::ostream& out, const TropicoFrac& tf)
 {
     bool isFrac = false, positFrac = false;
-    std::map<DegreeFrac, std::vector<int>> TeXPDF;
+    int signN, signM;
+    std::map<int, int> TeXPDF;
 
     for (const PrimeDegreeFrac& p : tf.n)
     {
         if (p.GetDegreeFrac() < 0)
             isFrac = true;
         
-        TeXPDF[p.GetDegreeFrac()].push_back(p.GetPrime());
+        signN = p.GetDegreeFrac().GetN() >= 0 ? 1 : -1;
+        signM = signN * p.GetDegreeFrac().GetM();
+
+        if (!TeXPDF.contains(signM))
+            TeXPDF[signM] = 1;
+
+        for (int i{}; i < signN * p.GetDegreeFrac().GetN(); ++i)
+            TeXPDF[signM] *= p.GetPrime();
     }
 
     if (isFrac)
@@ -309,9 +307,9 @@ std::ostream& MakeTeX(std::ostream& out, const TropicoFrac& tf)
 
     out << "} {";
 
-    for (const auto& t : TeXPDF)
-        if (t.first < 0)
-            SqrtProd(out, t, -1);
+    for (auto t = TeXPDF.crbegin(); t != TeXPDF.crend(); ++t)
+        if (t->first < 0)
+            SqrtProd(out, *t, -1);
 
     out << "}";
 
@@ -322,8 +320,6 @@ bool TropicoFrac::operator<=(const TropicoFrac& tf) const
 {
     DegreeFrac df;
     TropicoFrac tf1(*this), tf2(tf), tf3;
-
-    // std::cout << tf1 << " " << tf2 << "\n";
 
     this->PositiveDegree(tf1, tf2);
     tf.PositiveDegree(tf1, tf2);
@@ -578,20 +574,26 @@ TropicoMatrix TropicoMatrix::MultiConjTrans() const
     return MCT;
 }
 
-void TropicoMatrix::Standardization()
+TropicoMatrix& TropicoMatrix::Standardization()
 {
-    if (GetWidth() != 1)
-        throw std::invalid_argument("It is not vector.");
+    if (GetHeight() < 1 || GetWidth() < 1)
+        throw std::invalid_argument("Matrix is empty.");
 
-    if (GetHeight() < 1)
-        throw std::invalid_argument("Vector is empty.");
+    for (size_t j{}; j < GetWidth(); ++j)
+    {
+        TropicoFrac sum;
+        TropicoMatrix _tm = SubMatrix(0, j, GetHeight(), 1);
 
-    TropicoFrac sum;
+        for (size_t i{}; i < GetHeight(); ++i)
+            sum += matr[i][j];
+        
+        _tm *= sum ^ (-1);
 
-    for (size_t i{}; i < GetHeight(); ++i)
-        sum += matr[i][0];
-    
-    *this *= sum ^ (-1);
+        for (size_t i{}; i < GetHeight(); ++i)
+            matr[i][j] = _tm[i][0];
+    }
+
+    return *this;
 }
 
 std::vector<std::vector<double>> TropicoMatrix::ToDouble() const
@@ -750,7 +752,7 @@ TropicoFrac TropicoMatrix::Trace() const
     return res;
 }
 
-TropicoFrac TropicoMatrix::SpectralRadius() const
+TropicoFrac TropicoMatrix::SpectralRadius(std::vector<TropicoMatrix>* degreeMatrix) const
 {
     if (GetWidth() != GetHeight())
         throw std::invalid_argument("Width of matrix and height of matrix not equal.");
@@ -759,7 +761,12 @@ TropicoFrac TropicoMatrix::SpectralRadius() const
     TropicoMatrix C(*this);
 
     for (size_t i{}; i < GetHeight(); ++i, C *= *this)
+    {
+        if (degreeMatrix)
+            degreeMatrix->push_back(C);
+        
         res += C.Trace() ^ DegreeFrac(1, i + 1);
+    }
 
     return res;
 }
@@ -776,6 +783,31 @@ TropicoMatrix TropicoMatrix::Kleene() const
         res += C;
 
     return res;
+}
+
+TropicoMatrix TropicoMatrix::RemoveCorrel() const
+{
+    bool isCorrel = false;
+    TropicoMatrix _tm(SubMatrix(0, 0, GetHeight(), 1));
+
+    for (size_t i{1}; i < GetWidth(); ++i)
+    {
+        isCorrel = false;
+
+        for (size_t j{}; j < _tm.GetWidth(); ++j)
+            if (CorrelVector(SubMatrix(0, i, GetHeight(), 1), _tm.SubMatrix(0, j, _tm.GetHeight(), 1)))
+                isCorrel = true;
+
+        if (!isCorrel)
+        {
+            _tm.Resize(_tm.GetHeight(), _tm.GetWidth() + 1);
+
+            for (size_t j{}; j < _tm.GetHeight(); ++j)
+                _tm[j][_tm.GetWidth() - 1] = matr[j][i];
+        }
+    }
+
+    return _tm;
 }
 
 std::ostream& operator<<(std::ostream& out, const TropicoMatrix& tm)
@@ -835,55 +867,44 @@ TropicoSolve::TropicoSolve(TropicoMatrix _tm) : tm(_tm)
         throw std::invalid_argument("Width of matrix and height of matrix not equal.");
 }
 
-TropicoMatrix TropicoSolve::WorstSolve()
+TropicoMatrix& TropicoSolve::WorstSolve()
 {
     delta = (TropicoMatrix(1, tm.GetWidth(), 1) * kleene * TropicoMatrix(tm.GetHeight(), 1, 1))[0][0];
     worstMatr = ((delta ^ (-1)) * TropicoMatrix(tm.GetHeight(), tm.GetWidth(), 1) + (spectral ^ (-1)) * tm).Kleene();
-    worst = worstMatr * TropicoMatrix(tm.GetHeight(), 1, 1);
-
-    worst.Standardization();
+    worst = worstMatr.RemoveCorrel().Standardization();
 
     return worst;
 }
 
 TropicoMatrix TropicoSolve::MakeP() const
 {
-    bool isCorrel = false;
-    TropicoMatrix _P(kleene.SubMatrix(0, 0, kleene.GetHeight(), 1));
+    TropicoMatrix _P;
 
-    for (size_t i{1}; i < kleene.GetWidth(); ++i)
-    {
-        isCorrel = false;
-
-        for (size_t j{}; j < _P.GetWidth(); ++j)
-            if (CorrelVector(kleene.SubMatrix(0, i, kleene.GetHeight(), 1), _P.SubMatrix(0, j, _P.GetHeight(), 1)))
-                isCorrel = true;
-
-        if (!isCorrel)
-        {
-            _P.Resize(_P.GetHeight(), _P.GetWidth() + 1);
-
-            for (size_t j{}; j < _P.GetHeight(); ++j)
-                _P[j][_P.GetWidth() - 1] = kleene[j][i];
-        }
-    }
+    _P = kleene.RemoveCorrel();
 
     return _P;
 }
 
-TropicoMatrix TropicoSolve::MakePlk() const
+std::vector<TropicoMatrix> TropicoSolve::MakePlk() const
 {
-    size_t k, l;
+    std::vector<size_t> k, l;
     TropicoFrac maxPj, value;
-    TropicoMatrix _Plk(P.GetHeight(), P.GetWidth());
+    std::vector<TropicoMatrix> _Plk;
 
     for (size_t i{}; i < P.GetWidth(); ++i)
     {
         if ((value = (TropicoMatrix(1, tm.GetWidth(), 1) * (P.SubMatrix(0, i, P.GetHeight(), 1) * P.SubMatrix(0, i, P.GetHeight(), 1).MultiConjTrans()) *
-                      TropicoMatrix(tm.GetHeight(), 1, 1))[0][0]) > maxPj)
+                      TropicoMatrix(tm.GetHeight(), 1, 1))[0][0]) >= maxPj)
         {
-            maxPj = value;
-            k = i;      
+            if (value == maxPj)
+                k.push_back(i);
+            else
+            {
+                k.clear();
+                k.push_back(i);
+            }
+
+            maxPj = value;    
         }
     }
 
@@ -891,33 +912,51 @@ TropicoMatrix TropicoSolve::MakePlk() const
 
     for (size_t i{}; i < P.GetHeight(); ++i)
     {
-        if ((value = P[i][k] ^ (-1)) > maxPj)
-        {
-            maxPj = value;
-            l = i;
-        }
+        for (const size_t& _k : k)
+            if ((value = P[i][_k] ^ (-1)) > maxPj)
+            {
+                if (value == maxPj)
+                    l.push_back(i);
+                else
+                {
+                    l.clear();
+                    l.push_back(i);
+                }
+
+                maxPj = value;
+            }
     }
 
-    _Plk[l][k] = P[l][k];
+    for (const size_t& _k : k)
+    {
+        for (const size_t& _l : l)
+        {
+            TropicoMatrix _P(P.GetHeight(), P.GetWidth());
+            _P[_l][_k] = P[_l][_k];
+            _Plk.push_back(_P);
+        }
+    }
 
     return _Plk;
 }
 
-TropicoMatrix TropicoSolve::BestSolve()
+std::vector<TropicoMatrix>& TropicoSolve::BestSolve()
 {
     P = MakeP();
     Plk = MakePlk();
 
-    bestMatr = P * (TropicoMatrix::GetI(P.GetWidth()) + Plk.MultiConjTrans() * P);
-    best = bestMatr * TropicoMatrix(P.GetWidth(), 1, 1);
-    best.Standardization();
+    for (const TropicoMatrix& _tm : Plk)
+    {
+        bestMatr.push_back(P * (TropicoMatrix::GetI(P.GetWidth()) + _tm.MultiConjTrans() * P));
+        best.push_back((bestMatr.back()).RemoveCorrel().Standardization());
+    }
 
     return best;
 }
 
 void TropicoSolve::Solve()
 {
-    spectral = tm.SpectralRadius();
+    spectral = tm.SpectralRadius(&degreeTM);
     kleene = ((spectral ^ (-1)) * tm).Kleene();
 
     WorstSolve();
@@ -946,17 +985,28 @@ std::ostream& MakeTeXFrac(std::ostream& out, std::string str, const TropicoFrac&
 std::ostream& MakeTeX(std::ostream& out, const TropicoSolve& ts)
 {
     MakeTeXMatrix(out, "\\bold{" + ts.GetName() + "}", ts.GetMatrix());
+
+    for (size_t i{1}; i < ts.GetDegreeMatrix().size(); ++i)
+        MakeTeXMatrix(out, "\\left(\\bold{" + ts.GetName() + "}\\right)^{" + std::to_string(i + 1) + "}", ts.GetDegreeMatrix()[i]);
+
     MakeTeXFrac(out, "\\lambda_{" + ts.GetName() + "}", ts.GetSpectral());
-    MakeTeXMatrix(out, "(\\lambda_{" + ts.GetName() + "}^{-1}\\bold{" + ts.GetName() + "})^*", ts.GetKleene());
+    MakeTeXMatrix(out, "\\left(\\lambda_{" + ts.GetName() + "}^{-1}\\bold{" + ts.GetName() + "}\\right)^*", ts.GetKleene());
     MakeTeXFrac(out, "\\delta_{" + ts.GetName() + "}", ts.GetDelta());
-    MakeTeXMatrix(out, "(\\delta_{" + ts.GetName() + "}^{-1}\\bold{11}^T \\oplus \\lambda_{" +
-                  ts.GetName() + "}\\bold{" + ts.GetName() + "})^*", ts.GetWorstMatrix());
+    MakeTeXMatrix(out, "\\left(\\delta_{" + ts.GetName() + "}^{-1}\\bold{11}^T \\oplus \\lambda_{" +
+                  ts.GetName() + "}\\bold{" + ts.GetName() + "}\\right)^*", ts.GetWorstMatrix());
     MakeTeXMatrix(out, "\\bold{x}'_{" + ts.GetName() + "}", ts.GetWorst());
     MakeTeXMatrix(out, "\\bold{P}_{" + ts.GetName() + "}", ts.GetP());
-    MakeTeXMatrix(out, "\\bold{P}^{lk}_{" + ts.GetName() + "}", ts.GetPlk());
-    MakeTeXMatrix(out, "\\bold{P}_{" + ts.GetName() + "}(\\bold{I} \\oplus \\bold{P}^{lk}_{" +
-                  ts.GetName() + "}\\bold{P}_{" + ts.GetName() + "})", ts.GetBestMatrix());
-    MakeTeXMatrix(out, "\\bold{x}''_{" + ts.GetName() + "}", ts.GetBest());
+
+    for (size_t i{}; i < ts.GetPlk().size(); ++i)
+    {
+        if (ts.GetPlk().size() > 1)
+            out << "\t" << i + 1 << ")\n";
+
+        MakeTeXMatrix(out, "\\bold{" + ts.GetName() + "}: \\bold{P}_{lk}", ts.GetPlk()[i]);
+        MakeTeXMatrix(out, "\\bold{P}_{" + ts.GetName() + "}\\left(\\bold{I} \\oplus \\bold{P}_{lk}" +
+                        "\\bold{P}_{" + ts.GetName() + "}\\right)", ts.GetBestMatrix()[i]);
+        MakeTeXMatrix(out, "\\bold{x}''_{" + ts.GetName() + "}", ts.GetBest()[i]);
+    }
 
     return out;
 }
@@ -966,6 +1016,13 @@ std::ostream& operator<<(std::ostream& out, const TropicoSolve& ts)
     out << "Matrix " << ts.GetName() << ":\n";
     out << ts.GetMatrix() << "~\n";
     ToDoubleOut(out, ts.GetMatrix()) << "\n";
+
+    for (size_t i{1}; i < ts.GetDegreeMatrix().size(); ++i)
+    {
+        out << "(" << ts.GetName() << ")^{" << i + 1 << "}:\n" << ts.GetDegreeMatrix()[i];
+        ToDoubleOut(out, ts.GetDegreeMatrix()[i]) << "\n";
+    }
+
     out << "Spectral Radius: " << ts.GetSpectral() << " ~ " << ts.GetSpectral().ToDouble() << "\n\n";
     out << "Kleene:\n" << ts.GetKleene() << "~\n";
     ToDoubleOut(out, ts.GetKleene()) << "\n";
@@ -976,12 +1033,19 @@ std::ostream& operator<<(std::ostream& out, const TropicoSolve& ts)
     ToDoubleOut(out, ts.GetWorst()) << "\n";
     out << "P:\n" << ts.GetP() << "~\n";
     ToDoubleOut(out, ts.GetP()) << "\n";
-    out << "P_{lk}:\n" << ts.GetPlk() << "~\n";
-    ToDoubleOut(out, ts.GetPlk()) << "\n";
-    out << "Best Solve Matrix:\n" << ts.GetBestMatrix() << "~\n";
-    ToDoubleOut(out, ts.GetBestMatrix()) << "\n";
-    out << "Best Solve:\n" << ts.GetBest() << "~\n";
-    ToDoubleOut(out, ts.GetBest()) << "\n";
+
+    for (size_t i{}; i < ts.GetPlk().size(); ++i)
+    {
+        if (ts.GetPlk().size() > 1)
+            out << i + 1 << ")\n";
+
+        out << "P_{lk}:\n" << ts.GetPlk()[i] << "~\n";
+        ToDoubleOut(out, ts.GetPlk()[i]) << "\n";
+        out << "Best Solve Matrix:\n" << ts.GetBestMatrix()[i] << "~\n";
+        ToDoubleOut(out, ts.GetBestMatrix()[i]) << "\n";
+        out << "Best Solve:\n" << ts.GetBest()[i] << "~\n";
+        ToDoubleOut(out, ts.GetBest()[i]) << "\n";
+    }
 
     return out;
 }
@@ -991,29 +1055,43 @@ void TropicoMultiSolve::Solve()
     tsC = C;
 
     tsC.Solve();
+    tsC.GiveName("C");
 
     for (size_t i{}; i < tsC.GetWorst().GetHeight(); ++i)
         BWorst += tsC.GetWorst()[i][0] * A[i];
 
-    for (size_t i{}; i < tsC.GetBest().GetHeight(); ++i)
-        BBest += tsC.GetBest()[i][0] * A[i];
-
     tsBW = BWorst;
-    tsBB = BBest;
 
     tsBW.Solve();
-    tsBB.Solve();
-
-    tsC.GiveName("C");
     tsBW.GiveName("B_1");
-    tsBB.GiveName("B_2");
+
+    for (const TropicoMatrix& _tm : tsC.GetBest())
+    {
+        TropicoMatrix BB(BWorst.GetHeight(), BWorst.GetWidth());
+
+        for (size_t i{}; i < _tm.GetHeight(); ++i)
+            BB += _tm[i][0] * A[i];
+
+        BBest.push_back(BB);
+
+        tsBB.push_back(BB);
+
+        tsBB.back().Solve();
+
+        if (BBest.size() > 1)
+            tsBB.back().GiveName("B_2^{(" + std::to_string(BBest.size()) + ")}");
+        else
+            tsBB.back().GiveName("B_2");
+    }
 }
 
 std::ostream& MakeTeX(std::ostream& out, const TropicoMultiSolve& tms)
 {
     MakeTeX(out, tms.tsC) << "\n";
     MakeTeX(out, tms.tsBW) << "\n";
-    MakeTeX(out, tms.tsBB) << "\n";
+
+    for (const TropicoSolve& _ts : tms.tsBB)
+        MakeTeX(out, _ts) << "\n";
 
     return out;
 }
@@ -1022,7 +1100,9 @@ std::ostream& operator<<(std::ostream& out, const TropicoMultiSolve& tms)
 {
     out << tms.tsC << "\n";
     out << tms.tsBW << "\n";
-    out << tms.tsBB << "\n";
+
+    for (const TropicoSolve& _ts : tms.tsBB)
+        out << _ts << "\n";
 
     return out;
 }
@@ -1039,7 +1119,6 @@ std::istream& operator>>(std::istream& in, TropicoMultiSolve& tms)
     }
 
     tms.BWorst.Resize(tms.A[0].GetHeight(), tms.A[0].GetWidth());
-    tms.BBest.Resize(tms.BWorst.GetHeight(), tms.BWorst.GetWidth());
 
     return in;
 }
