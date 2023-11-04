@@ -6,8 +6,14 @@ void WriteTeX (std::string nameTeX, TropicoMultiSolve& tms)
 {
     std::ifstream inTeXf;
     std::ofstream outTeXf;
-    std::string command = "mv " + nameTeX + " " + nameTeX + ".c";
+    std::string command;
     std::string str;
+
+#ifdef __linux
+    command = "mv " + nameTeX + " " + nameTeX + ".c";
+#else
+    command = "move " + nameTeX + " " + nameTeX + ".c";
+#endif
 
     std::system(command.c_str());
     
@@ -43,7 +49,11 @@ void WriteTeX (std::string nameTeX, TropicoMultiSolve& tms)
     while (std::getline(inTeXf, str))
         outTeXf << str << "\n";
 
+#ifdef __linux
     command = "rm " + nameTeX + ".c";
+#else
+    command = "del " + nameTeX + ".c";
+#endif
 
     std::system(command.c_str());
 
