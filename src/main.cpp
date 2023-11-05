@@ -12,7 +12,13 @@ void WriteTeX (std::string nameTeX, TropicoMultiSolve& tms)
 #ifdef __linux
     command = "mv " + nameTeX + " " + nameTeX + ".c";
 #else
-    command = "move " + nameTeX + " " + nameTeX + ".c";
+    size_t pos = 0;
+    std::string nameWithoutPath = nameTeX;
+
+    while ((pos = nameWithoutPath.find('\\')) != std::string::npos)
+        nameWithoutPath = nameWithoutPath.substr(pos + 1);
+
+    command = "ren " + nameTeX + " " + nameWithoutPath + ".c";
 #endif
 
     std::system(command.c_str());
@@ -49,6 +55,9 @@ void WriteTeX (std::string nameTeX, TropicoMultiSolve& tms)
     while (std::getline(inTeXf, str))
         outTeXf << str << "\n";
 
+    inTeXf.close();
+    outTeXf.close();
+
 #ifdef __linux
     command = "rm " + nameTeX + ".c";
 #else
@@ -56,24 +65,19 @@ void WriteTeX (std::string nameTeX, TropicoMultiSolve& tms)
 #endif
 
     std::system(command.c_str());
-
-    inTeXf.close();
-    outTeXf.close();
 }
 
 int main(int argc, char* argv[])
 {
-    std::istream* in;
-    std::ostream* out;
+    std::istream* in = & std::cin;
+    std::ostream* out = & std::cout;
     std::ifstream inf;
     std::ofstream outf;
+#ifdef __linux
     std::string nameTeX = "TeX/Tropico.tex";
-
-    if (argc >= 1)
-    {
-        in = &std::cin;
-        out = &std::cout;
-    }
+#else
+    std::string nameTeX = "TeX\\Tropico.tex";
+#endif
 
     if (argc >= 2)
     {

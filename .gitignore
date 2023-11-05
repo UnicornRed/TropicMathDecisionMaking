@@ -6,6 +6,7 @@
 /obj
 /.vs
 /*.json
-TeX
+TeX/*
+!TeX/Tropico.tex
 input
 output
