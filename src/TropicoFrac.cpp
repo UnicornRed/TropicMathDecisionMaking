@@ -958,6 +958,7 @@ void TropicoSolve::Solve()
 {
     spectral = tm.SpectralRadius(&degreeTM);
     kleene = ((spectral ^ (-1)) * tm).Kleene();
+    kleeneWithoutCorrel = kleene.RemoveCorrel();
 
     WorstSolve();
     BestSolve();
@@ -989,9 +990,13 @@ std::ostream& MakeTeX(std::ostream& out, const TropicoSolve& ts)
     for (size_t i{1}; i < ts.GetDegreeMatrix().size(); ++i)
         MakeTeXMatrix(out, "\\left(\\bold{" + ts.GetName() + "}\\right)^{" + std::to_string(i + 1) + "}", ts.GetDegreeMatrix()[i]);
 
-    MakeTeXFrac(out, "\\lambda_{" + ts.GetName() + "}", ts.GetSpectral());
+    MakeTeXFrac(out, "\\lambda_{" + ts.GetName() + "} =  \\bigoplus ^{" + std::to_string(ts.GetMatrix().GetHeight()) +
+                "} _{k = 1} \\operatorname{tr} ^{\\frac 1 k} \\left( \\bold{" +
+                ts.GetName() + "} ^k \\right)", ts.GetSpectral());
     MakeTeXMatrix(out, "\\left(\\lambda_{" + ts.GetName() + "}^{-1}\\bold{" + ts.GetName() + "}\\right)^*", ts.GetKleene());
-    MakeTeXFrac(out, "\\delta_{" + ts.GetName() + "}", ts.GetDelta());
+    MakeTeXMatrix(out, "\\bold{x}_{" + ts.GetName() + "}", ts.GetKleeneWithoutCorrel());
+    MakeTeXFrac(out, "\\delta_{" + ts.GetName() + "} = \\bold{1}^T \\left(\\lambda_{" + ts.GetName() +
+                "}^{-1}\\bold{" + ts.GetName() + "}\\right)^* \\bold{1}", ts.GetDelta());
     MakeTeXMatrix(out, "\\left(\\delta_{" + ts.GetName() + "}^{-1}\\bold{11}^T \\oplus \\lambda_{" +
                   ts.GetName() + "}\\bold{" + ts.GetName() + "}\\right)^*", ts.GetWorstMatrix());
     MakeTeXMatrix(out, "\\bold{x}'_{" + ts.GetName() + "}", ts.GetWorst());
@@ -1026,6 +1031,8 @@ std::ostream& operator<<(std::ostream& out, const TropicoSolve& ts)
     out << "Spectral Radius: " << ts.GetSpectral() << " ~ " << ts.GetSpectral().ToDouble() << "\n\n";
     out << "Kleene:\n" << ts.GetKleene() << "~\n";
     ToDoubleOut(out, ts.GetKleene()) << "\n";
+    out << "Kleene without correlated cols:\n" << ts.GetKleeneWithoutCorrel() << "~\n";
+    ToDoubleOut(out, ts.GetKleeneWithoutCorrel()) << "\n";
     out << "Delta: \n" << ts.GetDelta() << " ~ " << ts.GetDelta().ToDouble() << "\n\n";
     out << "Worst Solve Matrix:\n" << ts.GetWorstMatrix() << "~\n";
     ToDoubleOut(out, ts.GetWorstMatrix()) << "\n";
@@ -1087,6 +1094,11 @@ void TropicoMultiSolve::Solve()
 
 std::ostream& MakeTeX(std::ostream& out, const TropicoMultiSolve& tms)
 {
+    MakeTeXMatrix(out, "\\bold{C}", tms.C);
+
+    for (size_t i{}; i < tms.A.size(); ++i)
+        MakeTeXMatrix(out, "\\bold{A}_{" + std::to_string(i + 1) + "}", tms.A[i]);
+
     MakeTeX(out, tms.tsC) << "\n";
     MakeTeX(out, tms.tsBW) << "\n";
 
@@ -1098,6 +1110,15 @@ std::ostream& MakeTeX(std::ostream& out, const TropicoMultiSolve& tms)
 
 std::ostream& operator<<(std::ostream& out, const TropicoMultiSolve& tms)
 {
+    out << "C:\n" << tms.C << "~\n";
+    ToDoubleOut(out, tms.C) << "\n";
+
+    for (size_t i{}; i < tms.A.size(); ++i)
+    {
+        out << "A_" << i + 1 << "\n" << tms.A[i] << "~\n";
+        ToDoubleOut(out, tms.A[i]) << "\n";
+    }
+
     out << tms.tsC << "\n";
     out << tms.tsBW << "\n";
 

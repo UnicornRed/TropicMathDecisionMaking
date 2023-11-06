@@ -275,6 +275,7 @@ private:
     std::vector<TropicoMatrix> degreeTM;
     TropicoFrac spectral;
     TropicoMatrix kleene;
+    TropicoMatrix kleeneWithoutCorrel;
     TropicoMatrix worstMatr;
     std::vector<TropicoMatrix> bestMatr;
     TropicoMatrix worst;
@@ -318,6 +319,9 @@ public:
     /// @brief Getter.
     /// @return Kleene matrix of the matrix.
     inline const TropicoMatrix& GetKleene() const { return kleene; }
+    /// @brief Getter.
+    /// @return Kleene matrix of the matrix without correlated cols.
+    inline const TropicoMatrix& GetKleeneWithoutCorrel() const { return kleeneWithoutCorrel; }
     /// @brief Getter.
     /// @return Matrix of the worst solution.
     inline const TropicoMatrix& GetWorstMatrix() const { return worstMatr; }
