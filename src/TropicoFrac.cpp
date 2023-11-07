@@ -871,7 +871,7 @@ TropicoMatrix& TropicoSolve::WorstSolve()
 {
     delta = (TropicoMatrix(1, tm.GetWidth(), 1) * kleene * TropicoMatrix(tm.GetHeight(), 1, 1))[0][0];
     worstMatr = ((delta ^ (-1)) * TropicoMatrix(tm.GetHeight(), tm.GetWidth(), 1) + (spectral ^ (-1)) * tm).Kleene();
-    worst = worstMatr.RemoveCorrel().Standardization();
+    worst = (worstMatr * TropicoMatrix(worstMatr.GetWidth(), 1, TropicoFrac(1))).Standardization();
 
     return worst;
 }
@@ -948,7 +948,7 @@ std::vector<TropicoMatrix>& TropicoSolve::BestSolve()
     for (const TropicoMatrix& _tm : Plk)
     {
         bestMatr.push_back(P * (TropicoMatrix::GetI(P.GetWidth()) + _tm.MultiConjTrans() * P));
-        best.push_back((bestMatr.back()).RemoveCorrel().Standardization());
+        best.push_back(((bestMatr.back()) * TropicoMatrix(bestMatr.back().GetWidth(), 1, TropicoFrac(1))).Standardization());
     }
 
     return best;
@@ -992,7 +992,7 @@ std::ostream& MakeTeX(std::ostream& out, const TropicoSolve& ts)
 
     MakeTeXFrac(out, "\\lambda_{" + ts.GetName() + "} =  \\bigoplus ^{" + std::to_string(ts.GetMatrix().GetHeight()) +
                 "} _{k = 1} \\operatorname{tr} ^{\\frac 1 k} \\left( \\bold{" +
-                ts.GetName() + "} ^k \\right)", ts.GetSpectral());
+                ts.GetName() + "} \\right)^k", ts.GetSpectral());
     MakeTeXMatrix(out, "\\left(\\lambda_{" + ts.GetName() + "}^{-1}\\bold{" + ts.GetName() + "}\\right)^*", ts.GetKleene());
     MakeTeXMatrix(out, "\\bold{x}_{" + ts.GetName() + "}", ts.GetKleeneWithoutCorrel());
     MakeTeXFrac(out, "\\delta_{" + ts.GetName() + "} = \\bold{1}^T \\left(\\lambda_{" + ts.GetName() +
@@ -1085,7 +1085,7 @@ void TropicoMultiSolve::Solve()
 
         tsBB.back().Solve();
 
-        if (BBest.size() > 1)
+        if (tsC.GetBest().size() > 1)
             tsBB.back().GiveName("B_2^{(" + std::to_string(BBest.size()) + ")}");
         else
             tsBB.back().GiveName("B_2");
