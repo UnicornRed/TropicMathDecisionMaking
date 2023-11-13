@@ -126,7 +126,7 @@ int main(int argc, char* argv[])
         TropicoMultiSolve tms;
 
         if (argc == 1)
-            *out << "Input matrixes:\n";
+            *out << "Input matrices:\n";
 
         *in >> tms;
 
