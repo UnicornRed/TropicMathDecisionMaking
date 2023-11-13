@@ -998,7 +998,7 @@ std::ostream& MakeTeX(std::ostream& out, const TropicoSolve& ts)
     MakeTeXFrac(out, "\\delta_{" + ts.GetName() + "} = \\bold{1}^T \\left(\\lambda_{" + ts.GetName() +
                 "}^{-1}\\bold{" + ts.GetName() + "}\\right)^* \\bold{1}", ts.GetDelta());
     MakeTeXMatrix(out, "\\left(\\delta_{" + ts.GetName() + "}^{-1}\\bold{11}^T \\oplus \\lambda_{" +
-                  ts.GetName() + "}\\bold{" + ts.GetName() + "}\\right)^*", ts.GetWorstMatrix());
+                  ts.GetName() + "}^{-1}\\bold{" + ts.GetName() + "}\\right)^*", ts.GetWorstMatrix());
     MakeTeXMatrix(out, "\\bold{x}'_{" + ts.GetName() + "}", ts.GetWorst());
     MakeTeXMatrix(out, "\\bold{P}_{" + ts.GetName() + "}", ts.GetP());
 
