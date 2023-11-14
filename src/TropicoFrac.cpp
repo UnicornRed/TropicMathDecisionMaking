@@ -870,8 +870,8 @@ TropicoSolve::TropicoSolve(TropicoMatrix _tm) : tm(_tm)
 TropicoMatrix& TropicoSolve::WorstSolve()
 {
     delta = (TropicoMatrix(1, tm.GetWidth(), 1) * kleene * TropicoMatrix(tm.GetHeight(), 1, 1))[0][0];
-    worstMatr = ((delta ^ (-1)) * TropicoMatrix(tm.GetHeight(), tm.GetWidth(), 1) + (spectral ^ (-1)) * tm).Kleene();
-    worst = (worstMatr * TropicoMatrix(worstMatr.GetWidth(), 1, TropicoFrac(1))).Standardization();
+    worst = worstMatr = ((delta ^ (-1)) * TropicoMatrix(tm.GetHeight(), tm.GetWidth(), 1) + (spectral ^ (-1)) * tm).Kleene();
+    worst = worst.Standardization() * TropicoMatrix(worstMatr.GetWidth(), 1, TropicoFrac(1));
 
     return worst;
 }
@@ -948,7 +948,7 @@ std::vector<TropicoMatrix>& TropicoSolve::BestSolve()
     for (const TropicoMatrix& _tm : Plk)
     {
         bestMatr.push_back(P * (TropicoMatrix::GetI(P.GetWidth()) + _tm.MultiConjTrans() * P));
-        best.push_back(((bestMatr.back()) * TropicoMatrix(bestMatr.back().GetWidth(), 1, TropicoFrac(1))).Standardization());
+        best.push_back((bestMatr.back() * TropicoFrac(1)).Standardization() * TropicoMatrix(bestMatr.back().GetWidth(), 1, TropicoFrac(1)));
     }
 
     return best;
