@@ -290,9 +290,6 @@ std::ostream& MakeTeX(std::ostream& out, const TropicoFrac& tf)
             TeXPDF[signM] *= p.GetPrime();
     }
 
-    if (isFrac)
-        out << "\\frac";
-
     out << "{";
 
     for (const auto& t : TeXPDF)
@@ -305,7 +302,12 @@ std::ostream& MakeTeX(std::ostream& out, const TropicoFrac& tf)
     if (!positFrac)
         out << 1;
 
-    out << "} {";
+    out << "}";
+
+    if (isFrac)
+        out << " / ";
+
+    out << "{";
 
     for (auto t = TeXPDF.crbegin(); t != TeXPDF.crend(); ++t)
         if (t->first < 0)
@@ -959,6 +961,7 @@ void TropicoSolve::Solve()
     spectral = tm.SpectralRadius(&degreeTM);
     kleene = ((spectral ^ (-1)) * tm).Kleene();
     kleeneWithoutCorrel = kleene.RemoveCorrel();
+    kleeneWithoutCorrel.Standardization();
 
     WorstSolve();
     BestSolve();
