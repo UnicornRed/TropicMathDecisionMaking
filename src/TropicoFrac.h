@@ -278,8 +278,8 @@ private:
     TropicoMatrix kleeneWithoutCorrel;
     TropicoMatrix worstMatr;
     std::vector<TropicoMatrix> bestMatr;
-    TropicoMatrix worst;
-    std::vector<TropicoMatrix> best;
+    std::vector<TropicoMatrix> worst;
+    std::vector<std::vector<TropicoMatrix>> best;
     TropicoFrac delta;
     TropicoMatrix P;
     std::vector<TropicoMatrix> Plk;
@@ -292,7 +292,7 @@ public:
 
     /// @brief Finds the worst solution.
     /// @return Worst solution.
-    TropicoMatrix& WorstSolve();
+    std::vector<TropicoMatrix>& WorstSolve();
     /// @brief Makes P-matrix.
     /// @return P-matrix.
     TropicoMatrix MakeP() const;
@@ -301,7 +301,7 @@ public:
     std::vector<TropicoMatrix> MakePlk() const;
     /// @brief Finds the best solution.
     /// @return Best solution.
-    std::vector<TropicoMatrix>& BestSolve();
+    std::vector<std::vector<TropicoMatrix>>& BestSolve();
 
     /// @brief Gives the matrix a name.
     /// @param _name Name.
@@ -329,11 +329,11 @@ public:
     /// @return Vector of matrixes of the best solution.
     inline const std::vector<TropicoMatrix>& GetBestMatrix() const { return bestMatr; }
     /// @brief Getter.
-    /// @return Worst solution.
-    inline const TropicoMatrix& GetWorst() const { return worst; }
+    /// @return Vector of the worst solution.
+    inline const std::vector<TropicoMatrix>& GetWorst() const { return worst; }
     /// @brief Getter.
-    /// @return Vector of the best solution.
-    inline const std::vector<TropicoMatrix>& GetBest() const { return best; }
+    /// @return Vector of vectors of the best solution.
+    inline const std::vector<std::vector<TropicoMatrix>>& GetBest() const { return best; }
     /// @brief Getter.
     /// @return Delta.
     inline const TropicoFrac& GetDelta() const { return delta; }
@@ -366,10 +366,11 @@ class TropicoMultiSolve
 {
 private:
     TropicoMatrix C;
-    TropicoMatrix BWorst;
-    std::vector<TropicoMatrix> BBest;
-    TropicoSolve tsC, tsBW;
-    std::vector<TropicoSolve> tsBB;
+    std::vector<TropicoMatrix> BWorst;
+    std::vector<std::vector<TropicoMatrix>> BBest;
+    TropicoSolve tsC;
+    std::vector<TropicoSolve> tsBW;
+    std::vector<std::vector<TropicoSolve>> tsBB;
     std::vector<TropicoMatrix> A;
 public:
     TropicoMultiSolve() = default;

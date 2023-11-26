@@ -305,7 +305,7 @@
 		\end{pmatrix}
 	\]
 	\[
-		\bold{P}_{C}\left(\bold{I} \oplus \bold{P}_{lk}\bold{P}_{C}\right) = 
+		\bold{P}_{C}\left(\bold{I} \oplus \bold{P}_{lk}^{-}\bold{P}_{C}\right) = 
 		\begin{pmatrix}
 			{1}{} & {1} / {{2}} \\
 			{{2}}{} & {1}{} \\
@@ -334,6 +334,25 @@
 		\approx
 		\begin{pmatrix}
 			0.1984   \\
+			0.3969   \\
+			0.63     \\
+			1        \\
+			0.3969   \\
+		\end{pmatrix}
+	\]
+
+	\[
+		\bold{\omega} = 
+		\begin{pmatrix}
+			{1} / {{4}} \\
+			{1} / {\sqrt[3]{16}} \\
+			{1} / {\sqrt[3]{4}} \\
+			{1}{} \\
+			{1} / {\sqrt[3]{16}} \\
+		\end{pmatrix}
+		\approx
+		\begin{pmatrix}
+			0.25     \\
 			0.3969   \\
 			0.63     \\
 			1        \\
@@ -474,7 +493,7 @@
 		\end{pmatrix}
 	\]
 	\[
-		\bold{P}_{B_1}\left(\bold{I} \oplus \bold{P}_{lk}\bold{P}_{B_1}\right) = 
+		\bold{P}_{B_1}\left(\bold{I} \oplus \bold{P}_{lk}^{-}\bold{P}_{B_1}\right) = 
 		\begin{pmatrix}
 			{1}{} \\
 			{{2}} / {\sqrt[3]{5}} \\
@@ -503,161 +522,180 @@
 	\]
 
 	\[
-		\bold{B_2} = 
+		 = 
 		\begin{pmatrix}
-			{1}{} & {{5}} / {\sqrt[3]{16}} & {{3}} / {\sqrt[3]{16}} \\
-			{{2}}{} & {1}{} & {{2}}{} \\
-			{{5}} / {\sqrt[3]{4}} & {\sqrt[3]{2}}{} & {1}{} \\
+			{1} / {\sqrt[3]{128}} \\
+			{1} / {\sqrt[3]{16}} \\
+			{1} / {\sqrt[3]{4}} \\
+			{1}{} \\
+			{1} / {\sqrt[3]{16}} \\
 		\end{pmatrix}
 		\approx
 		\begin{pmatrix}
-			1        & 1.984    & 1.191    \\
-			2        & 1        & 2        \\
-			3.15     & 1.26     & 1        \\
+			0.1984   \\
+			0.3969   \\
+			0.63     \\
+			1        \\
+			0.3969   \\
 		\end{pmatrix}
 	\]
+
 	\[
-		\left(\bold{B_2}\right)^{2} = 
+		\bold{B_2^{}} = 
 		\begin{pmatrix}
-			{{5}} / {\sqrt[3]{2}} & {{5}} / {\sqrt[3]{16}} & {{5}} / {\sqrt[3]{2}} \\
-			{{5}\sqrt[3]{2}}{} & {{5}} / {\sqrt[3]{2}} & {{3}} / {\sqrt[3]{2}} \\
-			{{5}} / {\sqrt[3]{4}} & {{25}} / {{4}} & {{15}} / {{4}} \\
+			{1} / {\sqrt[3]{128}} & {{5}} / {\sqrt[3]{128}} & {{3}} / {\sqrt[3]{128}} \\
+			{{3}} / {\sqrt[3]{128}} & {1} / {\sqrt[3]{128}} & {1} / {\sqrt[3]{2}} \\
+			{{5}} / {\sqrt[3]{128}} & {1} / {\sqrt[3]{16}} & {1} / {\sqrt[3]{128}} \\
 		\end{pmatrix}
 		\approx
 		\begin{pmatrix}
-			3.969    & 1.984    & 3.969    \\
-			6.3      & 3.969    & 2.381    \\
-			3.15     & 6.25     & 3.75     \\
+			0.1984   & 0.9921   & 0.5953   \\
+			0.5953   & 0.1984   & 0.7937   \\
+			0.9921   & 0.3969   & 0.1984   \\
 		\end{pmatrix}
 	\]
 	\[
-		\left(\bold{B_2}\right)^{3} = 
+		\left(\bold{B_2^{}}\right)^{2} = 
 		\begin{pmatrix}
-			{{25}} / {{2}} & {{25}} / {\sqrt[3]{32}} & {{15}} / {\sqrt[3]{32}} \\
-			{{5}\sqrt[3]{4}}{} & {{25}} / {{2}} & {{5}\sqrt[3]{4}}{} \\
-			{{25}} / {{2}} & {{25}} / {{4}} & {{25}} / {{2}} \\
+			{{15}} / {\sqrt[3]{16384}} & {{3}} / {\sqrt[3]{2048}} & {{5}} / {\sqrt[3]{256}} \\
+			{{5}} / {\sqrt[3]{256}} & {{15}} / {\sqrt[3]{16384}} & {{9}} / {\sqrt[3]{16384}} \\
+			{{3}} / {\sqrt[3]{2048}} & {{25}} / {\sqrt[3]{16384}} & {{15}} / {\sqrt[3]{16384}} \\
 		\end{pmatrix}
 		\approx
 		\begin{pmatrix}
-			12.5     & 7.875    & 4.725    \\
-			7.937    & 12.5     & 7.937    \\
-			12.5     & 6.25     & 12.5     \\
+			0.5906   & 0.2362   & 0.7875   \\
+			0.7875   & 0.5906   & 0.3544   \\
+			0.2362   & 0.9843   & 0.5906   \\
 		\end{pmatrix}
 	\]
 	\[
-		\lambda_{B_2} =  \bigoplus ^{3} _{k = 1} \operatorname{tr} ^{\frac 1 k} \left( \bold{B_2} \right)^k = {\sqrt[3]{25}} / {\sqrt[3]{2}}\approx 2.321
-	\]
-	\[
-		\left(\lambda_{B_2}^{-1}\bold{B_2}\right)^* = 
+		\left(\bold{B_2^{}}\right)^{3} = 
 		\begin{pmatrix}
-			{1}{} & {\sqrt[3]{5}} / {{2}} & {\sqrt[3]{2}} / {\sqrt[3]{5}} \\
-			{{2}} / {\sqrt[3]{5}} & {1}{} & {\sqrt[3]{16}} / {\sqrt[3]{25}} \\
-			{\sqrt[3]{5}} / {\sqrt[3]{2}} & {\sqrt[3]{25}} / {\sqrt[3]{16}} & {1}{} \\
+			{{25}} / {{32}} & {{75}} / {{128}} & {{45}} / {{128}} \\
+			{{45}} / {{128}} & {{25}} / {{32}} & {{15}} / {{32}} \\
+			{{75}} / {{128}} & {{15}} / {{64}} & {{25}} / {{32}} \\
 		\end{pmatrix}
 		\approx
 		\begin{pmatrix}
-			1        & 0.855    & 0.7368   \\
-			1.17     & 1        & 0.8618   \\
-			1.357    & 1.16     & 1        \\
+			0.7812   & 0.5859   & 0.3516   \\
+			0.3516   & 0.7812   & 0.4688   \\
+			0.5859   & 0.2344   & 0.7812   \\
 		\end{pmatrix}
 	\]
 	\[
-		\bold{x}_{B_2} = 
+		\lambda_{B_2^{}} =  \bigoplus ^{3} _{k = 1} \operatorname{tr} ^{\frac 1 k} \left( \bold{B_2^{}} \right)^k = {\sqrt[3]{25}} / {\sqrt[3]{32}}\approx 0.921
+	\]
+	\[
+		\left(\lambda_{B_2^{}}^{-1}\bold{B_2^{}}\right)^* = 
 		\begin{pmatrix}
-			{\sqrt[3]{2}} / {\sqrt[3]{5}} \\
+			{1}{} & {\sqrt[3]{5}} / {\sqrt[3]{4}} & {\sqrt[3]{4}} / {\sqrt[3]{5}} \\
+			{\sqrt[3]{4}} / {\sqrt[3]{5}} & {1}{} & {\sqrt[3]{16}} / {\sqrt[3]{25}} \\
+			{\sqrt[3]{5}} / {\sqrt[3]{4}} & {\sqrt[3]{25}} / {\sqrt[3]{16}} & {1}{} \\
+		\end{pmatrix}
+		\approx
+		\begin{pmatrix}
+			1        & 1.077    & 0.9283   \\
+			0.9283   & 1        & 0.8618   \\
+			1.077    & 1.16     & 1        \\
+		\end{pmatrix}
+	\]
+	\[
+		\bold{x}_{B_2^{}} = 
+		\begin{pmatrix}
+			{\sqrt[3]{4}} / {\sqrt[3]{5}} \\
 			{\sqrt[3]{16}} / {\sqrt[3]{25}} \\
 			{1}{} \\
 		\end{pmatrix}
 		\approx
 		\begin{pmatrix}
-			0.7368   \\
+			0.9283   \\
 			0.8618   \\
 			1        \\
 		\end{pmatrix}
 	\]
 	\[
-		\delta_{B_2} = \bold{1}^T \left(\lambda_{B_2}^{-1}\bold{B_2}\right)^* \bold{1} = {\sqrt[3]{5}} / {\sqrt[3]{2}}\approx 1.357
+		\delta_{B_2^{}} = \bold{1}^T \left(\lambda_{B_2^{}}^{-1}\bold{B_2^{}}\right)^* \bold{1} = {\sqrt[3]{25}} / {\sqrt[3]{16}}\approx 1.16
 	\]
 	\[
-		\left(\delta_{B_2}^{-1}\bold{11}^T \oplus \lambda_{B_2}^{-1}\bold{B_2}\right)^* = 
+		\left(\delta_{B_2^{}}^{-1}\bold{11}^T \oplus \lambda_{B_2^{}}^{-1}\bold{B_2^{}}\right)^* = 
 		\begin{pmatrix}
-			{1}{} & {\sqrt[3]{5}} / {{2}} & {\sqrt[3]{2}} / {\sqrt[3]{5}} \\
-			{{2}} / {\sqrt[3]{5}} & {1}{} & {\sqrt[3]{16}} / {\sqrt[3]{25}} \\
-			{\sqrt[3]{5}} / {\sqrt[3]{2}} & {\sqrt[3]{25}} / {\sqrt[3]{16}} & {1}{} \\
+			{1}{} & {\sqrt[3]{5}} / {\sqrt[3]{4}} & {\sqrt[3]{4}} / {\sqrt[3]{5}} \\
+			{\sqrt[3]{4}} / {\sqrt[3]{5}} & {1}{} & {\sqrt[3]{16}} / {\sqrt[3]{25}} \\
+			{\sqrt[3]{5}} / {\sqrt[3]{4}} & {\sqrt[3]{25}} / {\sqrt[3]{16}} & {1}{} \\
 		\end{pmatrix}
 		\approx
 		\begin{pmatrix}
-			1        & 0.855    & 0.7368   \\
-			1.17     & 1        & 0.8618   \\
-			1.357    & 1.16     & 1        \\
+			1        & 1.077    & 0.9283   \\
+			0.9283   & 1        & 0.8618   \\
+			1.077    & 1.16     & 1        \\
 		\end{pmatrix}
 	\]
 	\[
-		\bold{x}'_{B_2} = 
+		\bold{x}'_{B_2^{}} = 
 		\begin{pmatrix}
-			{\sqrt[3]{2}} / {\sqrt[3]{5}} \\
+			{\sqrt[3]{4}} / {\sqrt[3]{5}} \\
 			{\sqrt[3]{16}} / {\sqrt[3]{25}} \\
 			{1}{} \\
 		\end{pmatrix}
 		\approx
 		\begin{pmatrix}
-			0.7368   \\
+			0.9283   \\
 			0.8618   \\
 			1        \\
 		\end{pmatrix}
 	\]
 	\[
-		\bold{P}_{B_2} = 
+		\bold{P}_{B_2^{}} = 
 		\begin{pmatrix}
 			{1}{} \\
-			{{2}} / {\sqrt[3]{5}} \\
-			{\sqrt[3]{5}} / {\sqrt[3]{2}} \\
+			{\sqrt[3]{4}} / {\sqrt[3]{5}} \\
+			{\sqrt[3]{5}} / {\sqrt[3]{4}} \\
 		\end{pmatrix}
 		\approx
 		\begin{pmatrix}
 			1        \\
-			1.17     \\
-			1.357    \\
+			0.9283   \\
+			1.077    \\
 		\end{pmatrix}
 	\]
 	\[
-		\bold{B_2}: \bold{P}_{lk} = 
+		\bold{B_2^{}}: \bold{P}_{lk} = 
 		\begin{pmatrix}
-			{1}{} \\
 			{{0}}{} \\
+			{\sqrt[3]{4}} / {\sqrt[3]{5}} \\
 			{{0}}{} \\
 		\end{pmatrix}
 		\approx
 		\begin{pmatrix}
-			1        \\
 			0        \\
+			0.9283   \\
 			0        \\
 		\end{pmatrix}
 	\]
 	\[
-		\bold{P}_{B_2}\left(\bold{I} \oplus \bold{P}_{lk}\bold{P}_{B_2}\right) = 
+		\bold{P}_{B_2^{}}\left(\bold{I} \oplus \bold{P}_{lk}^{-}\bold{P}_{B_2^{}}\right) = 
 		\begin{pmatrix}
 			{1}{} \\
-			{{2}} / {\sqrt[3]{5}} \\
-			{\sqrt[3]{5}} / {\sqrt[3]{2}} \\
+			{\sqrt[3]{4}} / {\sqrt[3]{5}} \\
+			{\sqrt[3]{5}} / {\sqrt[3]{4}} \\
 		\end{pmatrix}
 		\approx
 		\begin{pmatrix}
 			1        \\
-			1.17     \\
-			1.357    \\
+			0.9283   \\
+			1.077    \\
 		\end{pmatrix}
 	\]
 	\[
-		\bold{x}''_{B_2} = 
+		\bold{x}''_{B_2^{}} = 
 		\begin{pmatrix}
-			{\sqrt[3]{2}} / {\sqrt[3]{5}} \\
+			{\sqrt[3]{4}} / {\sqrt[3]{5}} \\
 			{\sqrt[3]{16}} / {\sqrt[3]{25}} \\
 			{1}{} \\
 		\end{pmatrix}
 		\approx
 		\begin{pmatrix}
-			0.7368   \\
+			0.9283   \\
 			0.8618   \\
 			1        \\
 		\end{pmatrix}
