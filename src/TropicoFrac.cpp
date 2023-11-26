@@ -1103,10 +1103,13 @@ std::ostream& MakeTeX(std::ostream& out, const TropicoMultiSolve& tms)
         MakeTeXMatrix(out, "\\bold{A}_{" + std::to_string(i + 1) + "}", tms.A[i]);
 
     MakeTeX(out, tms.tsC) << "\n";
+    MakeTeX(out, tms.tsC.worst) << "\n";
     MakeTeX(out, tms.tsBW) << "\n";
 
-    for (const TropicoSolve& _ts : tms.tsBB)
-        MakeTeX(out, _ts) << "\n";
+    for (size_t i{}; i < tms.tsBB.size(); ++i) {
+        MakeTeX(out, tms.tsC.best[i]) << "\n";
+        MakeTeX(out, tms.tsBB[i]) << "\n";
+    }
 
     return out;
 }
