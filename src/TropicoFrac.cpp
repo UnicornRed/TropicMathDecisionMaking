@@ -248,15 +248,14 @@ bigint TropicoFrac::ValueIntPositive() const
 
 void SqrtProd(std::ostream& out, const std::pair<int, int> t, int sign = 1)
 {
+    out << "{" << t.second;
+    
     if (t.first != sign)
     {
-        if (std::abs(t.first) == 2)
-            out << "\\sqrt";
-        else
-            out << "\\sqrt[" << std::abs(t.first) << "]";
+        out << "^ {1 / " << std::abs(t.first) << "}";
     }
     
-    out << "{" << t.second << "}";
+    out << "}";
 }
 
 double TropicoFrac::ToDouble() const
@@ -1003,7 +1002,7 @@ std::ostream& MakeTeX(std::ostream& out, const TropicoSolve& ts)
         MakeTeXMatrix(out, "\\left(\\bold{" + ts.GetName() + "}\\right)^{" + std::to_string(i + 1) + "}", ts.GetDegreeMatrix()[i]);
 
     MakeTeXFrac(out, "\\lambda_{" + ts.GetName() + "} =  \\bigoplus ^{" + std::to_string(ts.GetMatrix().GetHeight()) +
-                "} _{k = 1} \\operatorname{tr} ^{\\frac 1 k} \\left( \\bold{" +
+                "} _{k = 1} \\operatorname{tr} ^{1 / k} \\left( \\bold{" +
                 ts.GetName() + "} \\right)^k", ts.GetSpectral());
     MakeTeXMatrix(out, "\\left(\\lambda_{" + ts.GetName() + "}^{-1}\\bold{" + ts.GetName() + "}\\right)^*", ts.GetKleene());
     MakeTeXMatrix(out, "\\bold{x}_{" + ts.GetName() + "}", ts.GetKleeneWithoutCorrel());
@@ -1138,7 +1137,7 @@ void TropicoMultiSolve::Solve()
             BBest[i][j].Resize(A[0].GetHeight(), A[0].GetWidth());
 
             for (size_t t{}; t < tsC.GetBest()[i][j].GetHeight(); ++t)
-                BBest[i][j] += tsC.GetBest()[i][j][i][0] * A[t];
+                BBest[i][j] += tsC.GetBest()[i][j][t][0] * A[t];
 
             tsBB.back().push_back(TropicoSolve(BBest[i][j]));
 
