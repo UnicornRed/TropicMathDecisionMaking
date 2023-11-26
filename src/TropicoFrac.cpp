@@ -1180,14 +1180,14 @@ std::ostream& MakeTeX(std::ostream& out, const TropicoMultiSolve& tms)
     for (size_t i{}; i < tms.tsBB.size(); ++i)
     {
         if (tms.tsBB.size() > 1)
-            out << i + 1 << "]\n";
+            out << i + 1 << "]]\n";
 
         for (size_t j{}; j < tms.tsBB[i].size(); ++j)
         {
             if (tms.tsBB[i].size() > 1)
-                out << "\t" << j + 1 << ".\n";
+                out << "\t" << j + 1 << "]]]\n";
 
-            MakeTeXMatrix(out, "", tms.tsC.GetBest()[i][j]) << "\n";
+            MakeTeXMatrix(out, "\\bold{\\omega}", tms.tsC.GetBest()[i][j]) << "\n";
             MakeTeX(out, tms.tsBB[i][j]) << "\n";
         }
     }
