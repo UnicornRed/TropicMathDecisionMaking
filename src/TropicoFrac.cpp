@@ -294,6 +294,9 @@ std::ostream& MakeTeX(std::ostream& out, const TropicoFrac& tf)
     for (const auto& t : TeXPDF)
         if (t.first > 0)
         {
+            if (positFrac)
+                out << " \\cdot ";
+
             positFrac = true;
             SqrtProd(out, t);
         }
@@ -308,9 +311,16 @@ std::ostream& MakeTeX(std::ostream& out, const TropicoFrac& tf)
 
     out << "{";
 
+    positFrac = false;
+
     for (auto t = TeXPDF.crbegin(); t != TeXPDF.crend(); ++t)
         if (t->first < 0)
+        {
+            if (positFrac)
+                out << " \\cdot ";
+                
             SqrtProd(out, *t, -1);
+        }
 
     out << "}";
 
