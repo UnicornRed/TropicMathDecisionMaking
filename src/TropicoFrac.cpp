@@ -246,7 +246,7 @@ bigint TropicoFrac::ValueIntPositive() const
     return res;
 }
 
-void SqrtProd(std::ostream& out, const std::pair<int, int> t, int sign = 1)
+void SqrtProd(std::ostream& out, const std::pair<long long, long long> t, int sign = 1)
 {
     out << "{" << t.second;
     
@@ -272,7 +272,7 @@ std::ostream& MakeTeX(std::ostream& out, const TropicoFrac& tf)
 {
     bool isFrac = false, positFrac = false;
     int signN, signM;
-    std::map<int, int> TeXPDF;
+    std::map<long long, long long> TeXPDF;
 
     for (const PrimeDegreeFrac& p : tf.n)
     {
@@ -1172,7 +1172,7 @@ std::ostream& MakeTeX(std::ostream& out, const TropicoMultiSolve& tms)
         if (tms.tsBW.size() > 1)
             out << "\t" << i + 1 << "]\n";
 
-        MakeTeXMatrix(out, "\\bold{\\omega}", tms.tsC.GetWorst()[i]) << "\n";
+        MakeTeXMatrix(out, "\\bold{w}", tms.tsC.GetWorst()[i]) << "\n";
         MakeTeX(out, tms.tsBW[i]) << "\n";
     }
 
@@ -1186,7 +1186,7 @@ std::ostream& MakeTeX(std::ostream& out, const TropicoMultiSolve& tms)
             if (tms.tsBB[i].size() > 1)
                 out << "\t" << j + 1 << "]]]\n";
 
-            MakeTeXMatrix(out, "\\bold{\\omega}", tms.tsC.GetBest()[i][j]) << "\n";
+            MakeTeXMatrix(out, "\\bold{w}", tms.tsC.GetBest()[i][j]) << "\n";
             MakeTeX(out, tms.tsBB[i][j]) << "\n";
         }
     }
