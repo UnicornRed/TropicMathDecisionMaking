@@ -319,6 +319,7 @@ std::ostream& MakeTeX(std::ostream& out, const TropicoFrac& tf)
             if (positFrac)
                 out << " \\cdot ";
                 
+            positFrac = true;
             SqrtProd(out, *t, -1);
         }
 
