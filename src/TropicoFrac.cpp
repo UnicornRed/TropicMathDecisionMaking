@@ -5,6 +5,29 @@
 #include <numeric>
 #include "TropicoFrac.h"
 
+unsigned long long gcd(unsigned long long a, unsigned long long b)
+{
+    while(true)
+    {
+        if (a == 0)
+            return b;
+
+        b %= a;
+
+        if (b == 0) 
+            return a;
+
+        a %= b;
+    }
+}
+
+unsigned long long lcm(unsigned long long a, unsigned long long b)
+{
+    unsigned long long temp = gcd(a, b);
+
+    return temp ? (a / temp * b) : 0;
+}
+
 void GcdFrac(int& n, int& m)
 {
     int minNM = std::min(std::abs(n), m), maxDel = 1;
@@ -282,7 +305,7 @@ std::ostream& MakeTeX(std::ostream& out, const TropicoFrac& tf)
         signN = p.GetDegreeFrac().GetN() >= 0 ? 1 : -1;
         signM = signN * p.GetDegreeFrac().GetM();
 
-        if (!TeXPDF.contains(signM))
+        if (!TeXPDF.count(signM))
             TeXPDF[signM] = 1;
 
         for (int i{}; i < signN * p.GetDegreeFrac().GetN(); ++i)
@@ -339,10 +362,10 @@ bool TropicoFrac::operator<=(const TropicoFrac& tf) const
     int m = 1;
 
     for (const PrimeDegreeFrac& p : n)
-        m = std::lcm(m, p.GetDegreeFrac().GetM());
+        m = lcm(m, p.GetDegreeFrac().GetM());
 
     for (const PrimeDegreeFrac& p : tf.n)
-        m = std::lcm(m, p.GetDegreeFrac().GetM());
+        m = lcm(m, p.GetDegreeFrac().GetM());
 
     tf1 ^= DegreeFrac(m);
     tf2 ^= DegreeFrac(m);
